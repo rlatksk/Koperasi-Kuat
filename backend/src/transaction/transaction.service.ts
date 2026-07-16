@@ -156,7 +156,7 @@ export class TransactionService {
     const [data, total] = await this.txRepo.findAndCount({
       where,
       relations: { barang: true },
-      order: { tanggal: 'DESC' },
+      order: { tanggal: 'DESC', nomor_transaksi: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
     });

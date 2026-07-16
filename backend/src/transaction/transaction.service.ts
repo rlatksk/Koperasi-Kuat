@@ -1,8 +1,9 @@
 import {
   Injectable, NotFoundException, ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, Between } from 'typeorm';
 import { StockTransaction } from './entities/transaction.entity';
 import { SequenceCounter } from './entities/sequence-counter.entity';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
@@ -63,12 +64,22 @@ export class TransactionService {
         throw new NotFoundException('Barang not found');
       }
 
-      const stockDelta =
-        dto.satuan === 'pembelian'
-          ? dto.quantity * Number(barang.konversi_satuan)
-          : dto.quantity;
+      const isPembelian = dto.tipe === 'pembelian';
+      const usesWholesale = dto.satuan === barang.satuan_pembelian;
 
-      barang.stok = Number(barang.stok) + stockDelta;
+      if (dto.satuan !== barang.satuan_pembelian && dto.satuan !== barang.satuan_penjualan) {
+        throw new BadRequestException(
+          `Satuan harus '${barang.satuan_pembelian}' atau '${barang.satuan_penjualan}'`,
+        );
+      }
+
+      const stockDelta = usesWholesale
+        ? dto.quantity * Number(barang.konversi_satuan)
+        : dto.quantity;
+
+      barang.stok = isPembelian
+        ? Number(barang.stok) + stockDelta
+        : Number(barang.stok) - stockDelta;
       await manager.save(barang);
 
       const tx = manager.create(StockTransaction, {
@@ -76,6 +87,7 @@ export class TransactionService {
         barang_id: dto.barang_id,
         tanggal: new Date(dto.tanggal),
         quantity: dto.quantity,
+        tipe: dto.tipe,
         satuan: dto.satuan,
         konversi_snapshot: Number(barang.konversi_satuan),
         status: 'ACTIVE',
@@ -105,12 +117,16 @@ export class TransactionService {
         throw new NotFoundException('Barang not found');
       }
 
-      const stockDelta =
-        tx.satuan === 'pembelian'
-          ? Number(tx.quantity) * Number(tx.konversi_snapshot)
-          : Number(tx.quantity);
+      const isPembelian = tx.tipe === 'pembelian';
+      const usesWholesale = tx.satuan === barang.satuan_pembelian;
 
-      barang.stok = Number(barang.stok) - stockDelta;
+      const stockDelta = usesWholesale
+        ? Number(tx.quantity) * Number(tx.konversi_snapshot)
+        : Number(tx.quantity);
+
+      barang.stok = isPembelian
+        ? Number(barang.stok) - stockDelta
+        : Number(barang.stok) + stockDelta;
       await manager.save(barang);
 
       tx.status = 'CANCELLED';
@@ -121,13 +137,21 @@ export class TransactionService {
   async findAll(query?: {
     barang_id?: string;
     status?: string;
+    tanggal_from?: string;
+    tanggal_to?: string;
     page?: number;
     limit?: number;
   }): Promise<{ data: StockTransaction[]; total: number }> {
-    const { barang_id, status, page = 1, limit = 20 } = query || {};
+    const { barang_id, status, tanggal_from, tanggal_to, page = 1, limit = 20 } = query || {};
     const where: any = {};
     if (barang_id) where.barang_id = barang_id;
     if (status) where.status = status;
+    if (tanggal_from || tanggal_to) {
+      where.tanggal = Between(
+        tanggal_from || '1900-01-01',
+        tanggal_to || '2099-12-31',
+      );
+    }
 
     const [data, total] = await this.txRepo.findAndCount({
       where,

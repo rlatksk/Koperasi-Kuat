@@ -10,7 +10,7 @@ interface ConfirmDialogProps {
 }
 
 export default function ConfirmDialog({
-  open, title, message, confirmLabel = 'Confirm', onConfirm, onCancel,
+  open, title, message, confirmLabel = 'Konfirmasi', onConfirm, onCancel,
 }: ConfirmDialogProps) {
   if (!open) return null;
 
@@ -25,7 +25,7 @@ export default function ConfirmDialog({
             onClick={onCancel}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
           >
-            Cancel
+            Batal
           </button>
           <button
             onClick={onConfirm}

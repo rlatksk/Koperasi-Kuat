@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Plus, PencilSimple, Trash } from '@phosphor-icons/react';
+import { Plus, PencilSimple, Trash, CaretLeft, CaretRight } from '@phosphor-icons/react';
 import { Barang } from '@/types';
 import { api } from '@/lib/api';
 import { useToast } from '@/components/toast';
@@ -15,16 +15,21 @@ export default function BarangPage() {
   const { success, error } = useToast();
   const [barang, setBarang] = useState<Barang[]>([]);
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const limit = 10;
+  const totalPages = Math.ceil(total / limit);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
-      const data = await api.barang.list(search || undefined);
-      setBarang(data);
+      const res = await api.barang.list({ search: search || undefined, page, limit });
+      setBarang(res.data);
+      setTotal(res.total);
     } catch (err: any) {
       error(err.message);
     }
-  }, [search, error]);
+  }, [search, page, error]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -32,7 +37,7 @@ export default function BarangPage() {
     if (!deleteId) return;
     try {
       await api.barang.delete(deleteId);
-      success('Barang deleted');
+      success('Barang berhasil dihapus');
       setDeleteId(null);
       fetchData();
     } catch (err: any) {
@@ -76,8 +81,8 @@ export default function BarangPage() {
         <input
           type="text"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by name or SKU..."
+          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+          placeholder="Cari berdasarkan nama atau SKU..."
           className="w-full max-w-sm px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
@@ -86,20 +91,20 @@ export default function BarangPage() {
         <DataTable
           columns={columns}
           data={barang}
-          emptyMessage="No barang found. Create your first one."
+          emptyMessage="Tidak ada barang. Buat barang pertama Anda."
           rowActions={(b) => (
             <div className="flex items-center gap-1 justify-end">
               <button
                 onClick={() => router.push(`/barang/${b.id}/edit`)}
                 className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                title="Edit"
+                title="Ubah"
               >
                 <PencilSimple size={16} />
               </button>
               <button
                 onClick={() => setDeleteId(b.id)}
                 className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                title="Delete"
+                title="Hapus"
               >
                 <Trash size={16} />
               </button>
@@ -108,11 +113,35 @@ export default function BarangPage() {
         />
       </div>
 
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-4 text-sm text-gray-500">
+          <span>
+            Halaman {page} dari {totalPages} ({total} data)
+          </span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className="p-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:border-blue-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              <CaretLeft size={18} weight="bold" />
+            </button>
+            <button
+              onClick={() => setPage((p) => p + 1)}
+              disabled={page >= totalPages}
+              className="p-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:border-blue-400 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              <CaretRight size={18} weight="bold" />
+            </button>
+          </div>
+        </div>
+      )}
+
       <ConfirmDialog
         open={!!deleteId}
-        title="Delete Barang"
-        message="Are you sure you want to delete this item?"
-        confirmLabel="Delete"
+        title="Hapus Barang"
+        message="Yakin ingin menghapus item ini?"
+        confirmLabel="Hapus"
         onConfirm={handleDelete}
         onCancel={() => setDeleteId(null)}
       />

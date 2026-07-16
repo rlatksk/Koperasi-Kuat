@@ -18,8 +18,14 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 
 export const api = {
   barang: {
-    list: (search?: string) =>
-      request<any[]>(`/barang${search ? `?search=${encodeURIComponent(search)}` : ''}`),
+    list: (params?: { search?: string; page?: number; limit?: number }) => {
+      const qs = new URLSearchParams();
+      if (params?.search) qs.set('search', params.search);
+      if (params?.page) qs.set('page', String(params.page));
+      if (params?.limit) qs.set('limit', String(params.limit));
+      const query = qs.toString();
+      return request<{ data: any[]; total: number }>(`/barang${query ? `?${query}` : ''}`);
+    },
     get: (id: string) => request<any>(`/barang/${id}`),
     create: (data: any) =>
       request<any>('/barang', { method: 'POST', body: JSON.stringify(data) }),
@@ -30,10 +36,12 @@ export const api = {
   },
 
   transaction: {
-    list: (params?: { barang_id?: string; status?: string; page?: number; limit?: number }) => {
+    list: (params?: { barang_id?: string; status?: string; tanggal_from?: string; tanggal_to?: string; page?: number; limit?: number }) => {
       const qs = new URLSearchParams();
       if (params?.barang_id) qs.set('barang_id', params.barang_id);
       if (params?.status) qs.set('status', params.status);
+      if (params?.tanggal_from) qs.set('tanggal_from', params.tanggal_from);
+      if (params?.tanggal_to) qs.set('tanggal_to', params.tanggal_to);
       if (params?.page) qs.set('page', String(params.page));
       if (params?.limit) qs.set('limit', String(params.limit));
       const query = qs.toString();

@@ -16,6 +16,8 @@ export default function TransactionPage() {
   const [barangList, setBarangList] = useState<Barang[]>([]);
   const [filterBarang, setFilterBarang] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
+  const [filterDateFrom, setFilterDateFrom] = useState('');
+  const [filterDateTo, setFilterDateTo] = useState('');
   const [cancelId, setCancelId] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
@@ -23,23 +25,25 @@ export default function TransactionPage() {
       const res = await api.transaction.list({
         status: filterStatus || undefined,
         barang_id: filterBarang || undefined,
+        tanggal_from: filterDateFrom || undefined,
+        tanggal_to: filterDateTo || undefined,
       });
       setTransactions(res.data || res);
     } catch (err: any) {
       error(err.message);
     }
-  }, [filterBarang, filterStatus, error]);
+  }, [filterBarang, filterStatus, filterDateFrom, filterDateTo, error]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
   useEffect(() => {
-    api.barang.list().then(setBarangList).catch(console.error);
+    api.barang.list().then((res) => setBarangList(res.data)).catch(console.error);
   }, []);
 
   const handleCancel = async () => {
     if (!cancelId) return;
     try {
       await api.transaction.cancel(cancelId);
-      success('Transaction cancelled');
+      success('Transaksi berhasil dibatalkan');
       setCancelId(null);
       fetchData();
     } catch (err: any) {
@@ -67,8 +71,8 @@ export default function TransactionPage() {
     },
     {
       key: 'quantity',
-      header: 'Quantity',
-      render: (t) => `${Number(t.quantity)} ${t.satuan === 'pembelian' ? '(Wholesale)' : '(Retail)'}`,
+      header: 'Jumlah',
+      render: (t) => `${Number(t.quantity)} ${t.satuan}`,
     },
     {
       key: 'status',
@@ -95,13 +99,13 @@ export default function TransactionPage() {
         </Link>
       </div>
 
-      <div className="flex gap-3 mb-4">
+      <div className="flex gap-3 mb-4 items-center">
         <select
           value={filterBarang}
           onChange={(e) => setFilterBarang(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-48"
         >
-          <option value="">All Barang</option>
+          <option value="">Semua Barang</option>
           {barangList.map((b) => (
             <option key={b.id} value={b.id}>{b.nama_barang}</option>
           ))}
@@ -110,19 +114,32 @@ export default function TransactionPage() {
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-40"
         >
-          <option value="">All Status</option>
-          <option value="ACTIVE">Active</option>
-          <option value="CANCELLED">Cancelled</option>
+          <option value="">Semua Status</option>
+          <option value="CANCELLED">Dibatalkan</option>
         </select>
+
+        <input
+          type="date"
+          value={filterDateFrom}
+          onChange={(e) => setFilterDateFrom(e.target.value)}
+          className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <span className="text-sm text-gray-400">s/d</span>
+        <input
+          type="date"
+          value={filterDateTo}
+          onChange={(e) => setFilterDateTo(e.target.value)}
+          className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <DataTable
           columns={columns}
           data={transactions}
-          emptyMessage="No transactions found."
+          emptyMessage="Tidak ada transaksi."
           rowActions={(t) =>
             t.status === 'ACTIVE' ? (
               <button
@@ -130,7 +147,7 @@ export default function TransactionPage() {
                 className="inline-flex items-center gap-1 px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded transition-colors"
               >
                 <XIcon size={12} />
-                Cancel
+                Batalkan
               </button>
             ) : null
           }
@@ -139,9 +156,9 @@ export default function TransactionPage() {
 
       <ConfirmDialog
         open={!!cancelId}
-        title="Cancel Transaction"
-        message="Are you sure you want to cancel this transaction? The stock will be reversed."
-        confirmLabel="Cancel Transaction"
+        title="Batalkan Transaksi"
+        message="Yakin ingin membatalkan transaksi ini? Stok akan dikembalikan."
+        confirmLabel="Batalkan Transaksi"
         onConfirm={handleCancel}
         onCancel={() => setCancelId(null)}
       />

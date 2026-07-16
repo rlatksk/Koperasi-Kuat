@@ -11,8 +11,12 @@ export class BarangController {
   constructor(private readonly barangService: BarangService) {}
 
   @Get()
-  findAll(@Query('search') search?: string) {
-    return this.barangService.findAll(search);
+  findAll(
+    @Query('search') search?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return this.barangService.findAll(search, page, limit);
   }
 
   @Get(':id')

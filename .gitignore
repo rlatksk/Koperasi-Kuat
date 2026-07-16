@@ -5,4 +5,8 @@ node_modules/
 dist/
 # opencode and meta docs
 .opencode/
-docs/superpowers/
+docs/
+.superpowers/
+PRD.md
+AGENTS.md
+CLAUDE.md

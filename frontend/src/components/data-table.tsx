@@ -17,7 +17,7 @@ interface DataTableProps<T> {
 }
 
 export default function DataTable<T extends { id: string }>({
-  columns, data, emptyMessage = 'No data found', rowActions,
+  columns, data, emptyMessage = 'Tidak ada data', rowActions,
 }: DataTableProps<T>) {
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
@@ -65,7 +65,7 @@ export default function DataTable<T extends { id: string }>({
             ))}
             {rowActions && (
               <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
+                Aksi
               </th>
             )}
           </tr>

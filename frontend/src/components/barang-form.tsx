@@ -41,15 +41,15 @@ export default function BarangForm({ barang }: Props) {
     try {
       if (barang) {
         await api.barang.update(barang.id, data);
-        success('Barang updated successfully');
+        success('Barang berhasil diperbarui');
       } else {
         await api.barang.create(data);
-        success('Barang created successfully');
+        success('Barang berhasil dibuat');
       }
       router.push('/barang');
       router.refresh();
     } catch (err: any) {
-      error(err.message || 'Failed to save barang');
+      error(err.message || 'Gagal menyimpan barang');
     } finally {
       setLoading(false);
     }
@@ -86,7 +86,7 @@ export default function BarangForm({ barang }: Props) {
           value={form.satuan_pembelian}
           onChange={(e) => handleChange('satuan_pembelian', e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="e.g. Drum"
+          placeholder="cth. Drum"
           required
         />
       </div>
@@ -98,7 +98,7 @@ export default function BarangForm({ barang }: Props) {
           value={form.satuan_penjualan}
           onChange={(e) => handleChange('satuan_penjualan', e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="e.g. Liter"
+          placeholder="cth. Liter"
           required
         />
       </div>
@@ -114,7 +114,7 @@ export default function BarangForm({ barang }: Props) {
           className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           min="0.000001"
           step="any"
-          placeholder="e.g. 200"
+          placeholder="cth. 200"
           required
         />
       </div>
@@ -125,14 +125,14 @@ export default function BarangForm({ barang }: Props) {
           disabled={loading}
           className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
         >
-          {loading ? 'Saving...' : barang ? 'Update Barang' : 'Create Barang'}
+          {loading ? 'Menyimpan...' : barang ? 'Perbarui Barang' : 'Tambah Barang'}
         </button>
         <button
           type="button"
           onClick={() => router.push('/barang')}
           className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
         >
-          Cancel
+          Batal
         </button>
       </div>
     </form>

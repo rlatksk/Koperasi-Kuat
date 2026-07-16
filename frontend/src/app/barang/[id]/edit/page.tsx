@@ -24,7 +24,7 @@ export default function EditBarangPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold text-gray-900 mb-6">Edit Barang</h1>
+      <h1 className="text-xl font-bold text-gray-900 mb-6">Ubah Barang</h1>
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <BarangForm barang={barang} />
       </div>

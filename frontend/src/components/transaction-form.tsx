@@ -15,7 +15,8 @@ export default function TransactionForm() {
     barang_id: '',
     tanggal: new Date().toISOString().split('T')[0],
     quantity: '',
-    satuan: 'pembelian' as 'pembelian' | 'penjualan',
+    tipe: 'pembelian' as 'pembelian' | 'penjualan',
+    satuan: '',
     keterangan: '',
     nomor_transaksi: '',
   });
@@ -25,8 +26,10 @@ export default function TransactionForm() {
   const [sequenceError, setSequenceError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const selectedBarang = barangList.find((b) => b.id === form.barang_id);
+
   useEffect(() => {
-    api.barang.list().then(setBarangList).catch(console.error);
+    api.barang.list().then((res) => setBarangList(res.data)).catch(console.error);
   }, []);
 
   useEffect(() => {
@@ -38,6 +41,15 @@ export default function TransactionForm() {
     }
   }, [form.tanggal, isManual]);
 
+  useEffect(() => {
+    if (selectedBarang) {
+      const unit = form.tipe === 'pembelian'
+        ? selectedBarang.satuan_pembelian
+        : selectedBarang.satuan_penjualan;
+      setForm((f) => ({ ...f, satuan: unit }));
+    }
+  }, [form.barang_id, form.tipe, selectedBarang?.satuan_pembelian, selectedBarang?.satuan_penjualan]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -47,6 +59,7 @@ export default function TransactionForm() {
       barang_id: form.barang_id,
       tanggal: form.tanggal,
       quantity: parseFloat(form.quantity),
+      tipe: form.tipe,
       satuan: form.satuan,
       keterangan: form.keterangan || undefined,
     };
@@ -57,12 +70,12 @@ export default function TransactionForm() {
 
     try {
       await api.transaction.create(data);
-      success('Transaction created successfully');
+      success('Transaksi berhasil dibuat');
       router.push('/transaction');
       router.refresh();
     } catch (err: any) {
-      if (err.message?.includes('Sequence number already exists') || err.message?.includes('exists')) {
-        setSequenceError('Sequence number already exists');
+      if (err.message?.includes('exists') || err.message?.includes('sudah ada')) {
+        setSequenceError('Nomor transaksi sudah ada');
       } else {
         error(err.message);
       }
@@ -70,6 +83,13 @@ export default function TransactionForm() {
       setLoading(false);
     }
   };
+
+  const satuanOptions = selectedBarang
+    ? [
+        { value: selectedBarang.satuan_pembelian, label: selectedBarang.satuan_pembelian },
+        { value: selectedBarang.satuan_penjualan, label: selectedBarang.satuan_penjualan },
+      ]
+    : [];
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-lg">
@@ -81,7 +101,7 @@ export default function TransactionForm() {
           className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           required
         >
-          <option value="">Select Barang...</option>
+          <option value="">Pilih Barang...</option>
           {barangList.map((b) => (
             <option key={b.id} value={b.id}>
               {b.nama_barang} ({b.sku})
@@ -102,7 +122,49 @@ export default function TransactionForm() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Tipe Transaksi</label>
+        <div className="flex gap-4">
+          {(['pembelian', 'penjualan'] as const).map((t) => (
+            <label key={t} className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="tipe"
+                value={t}
+                checked={form.tipe === t}
+                onChange={() => setForm((f) => ({ ...f, tipe: t }))}
+                className="text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-sm text-gray-700">
+                {t === 'pembelian' ? 'Pembelian (Stok Masuk)' : 'Penjualan (Stok Keluar)'}
+              </span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {selectedBarang && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Satuan</label>
+          <select
+            value={form.satuan}
+            onChange={(e) => setForm((f) => ({ ...f, satuan: e.target.value }))}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            required
+          >
+            {satuanOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Jumlah
+          {form.satuan && <span className="text-gray-400 font-normal ml-1">({form.satuan})</span>}
+        </label>
         <input
           type="number"
           value={form.quantity}
@@ -115,30 +177,11 @@ export default function TransactionForm() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Satuan</label>
-        <div className="flex gap-4">
-          {(['pembelian', 'penjualan'] as const).map((s) => (
-            <label key={s} className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="satuan"
-                value={s}
-                checked={form.satuan === s}
-                onChange={() => setForm((f) => ({ ...f, satuan: s }))}
-                className="text-blue-600 focus:ring-blue-500"
-              />
-              <span className="text-sm text-gray-700 capitalize">{s}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-
-      <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Nomor Transaksi</label>
         {!isManual ? (
           <div className="flex items-center gap-2">
             <span className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm text-gray-600 flex-1 font-mono">
-              {autoSequence || 'Loading...'}
+              {autoSequence || 'Memuat...'}
             </span>
             <button
               type="button"
@@ -146,7 +189,7 @@ export default function TransactionForm() {
               className="inline-flex items-center gap-1 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
             >
               <PencilSimple size={14} />
-              Edit
+              Ubah
             </button>
           </div>
         ) : (
@@ -189,7 +232,7 @@ export default function TransactionForm() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Keterangan (optional)</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Keterangan (opsional)</label>
         <textarea
           value={form.keterangan}
           onChange={(e) => setForm((f) => ({ ...f, keterangan: e.target.value }))}
@@ -204,14 +247,14 @@ export default function TransactionForm() {
           disabled={loading}
           className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
         >
-          {loading ? 'Creating...' : 'Create Transaction'}
+          {loading ? 'Membuat...' : 'Buat Transaksi'}
         </button>
         <button
           type="button"
           onClick={() => router.push('/transaction')}
           className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
         >
-          Cancel
+          Batal
         </button>
       </div>
     </form>

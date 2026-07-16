@@ -13,10 +13,12 @@ export class TransactionController {
   findAll(
     @Query('barang_id') barang_id?: string,
     @Query('status') status?: string,
+    @Query('tanggal_from') tanggal_from?: string,
+    @Query('tanggal_to') tanggal_to?: string,
     @Query('page') page?: number,
     @Query('limit') limit?: number,
   ) {
-    return this.txService.findAll({ barang_id, status, page, limit });
+    return this.txService.findAll({ barang_id, status, tanggal_from, tanggal_to, page, limit });
   }
 
   @Get('sequence-preview')

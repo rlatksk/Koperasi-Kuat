@@ -1,5 +1,5 @@
 import {
-  IsOptional, IsString, IsUUID,
+  IsNotEmpty, IsOptional, IsString, IsUUID,
   IsDateString, IsPositive, IsIn, MaxLength,
 } from 'class-validator';
 
@@ -14,6 +14,11 @@ export class CreateTransactionDto {
   quantity: number;
 
   @IsIn(['pembelian', 'penjualan'])
+  tipe: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(50)
   satuan: string;
 
   @IsOptional()

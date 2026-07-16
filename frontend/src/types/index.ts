@@ -18,7 +18,8 @@ export interface Transaction {
   barang: { id: string; nama_barang: string };
   tanggal: string;
   quantity: number;
-  satuan: 'pembelian' | 'penjualan';
+  tipe: 'pembelian' | 'penjualan';
+  satuan: string;
   konversi_snapshot: number;
   status: 'ACTIVE' | 'CANCELLED';
   keterangan: string | null;
@@ -39,7 +40,8 @@ export interface CreateTransactionDto {
   barang_id: string;
   tanggal: string;
   quantity: number;
-  satuan: 'pembelian' | 'penjualan';
+  tipe: 'pembelian' | 'penjualan';
+  satuan: string;
   keterangan?: string;
   nomor_transaksi?: string;
 }

@@ -3,7 +3,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like } from 'typeorm';
+import { Repository, ILike } from 'typeorm';
 import { Barang } from './entities/barang.entity';
 import { CreateBarangDto } from './dto/create-barang.dto';
 import { UpdateBarangDto } from './dto/update-barang.dto';
@@ -24,14 +24,20 @@ export class BarangService {
     return this.barangRepository.save(barang);
   }
 
-  async findAll(search?: string): Promise<Barang[]> {
+  async findAll(search?: string, page = 1, limit = 10): Promise<{ data: Barang[]; total: number }> {
     const where = search
       ? [
-          { nama_barang: Like(`%${search}%`) },
-          { sku: Like(`%${search}%`) },
+          { nama_barang: ILike(`%${search}%`) },
+          { sku: ILike(`%${search}%`) },
         ]
       : {};
-    return this.barangRepository.find({ where, order: { created_at: 'DESC' } });
+    const [data, total] = await this.barangRepository.findAndCount({
+      where,
+      order: { created_at: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+    return { data, total };
   }
 
   async findOne(id: string): Promise<Barang> {

@@ -7,6 +7,7 @@ export interface Column<T> {
   header: string;
   render: (item: T) => ReactNode;
   sortable?: boolean;
+  width?: string;
 }
 
 interface DataTableProps<T> {
@@ -45,14 +46,15 @@ export default function DataTable<T extends { id: string }>({
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+    <div>
+      <table className="w-full text-sm table-fixed">
         <thead>
           <tr className="border-b border-gray-200">
             {columns.map((col) => (
               <th
                 key={col.key}
-                className={`px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                style={col.width ? { width: col.width } : undefined}
+                className={`px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${
                   col.sortable ? 'cursor-pointer hover:text-gray-700 select-none' : ''
                 }`}
                 onClick={() => col.sortable && handleSort(col.key)}
@@ -64,7 +66,7 @@ export default function DataTable<T extends { id: string }>({
               </th>
             ))}
             {rowActions && (
-              <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[9%]">
                 Aksi
               </th>
             )}
@@ -74,12 +76,12 @@ export default function DataTable<T extends { id: string }>({
           {sorted.map((item) => (
             <tr key={item.id} className="hover:bg-gray-50 transition-colors">
               {columns.map((col) => (
-                <td key={col.key} className="px-4 py-3 text-gray-700">
+                <td key={col.key} className="px-3 py-3 text-gray-700 truncate" style={col.width ? { width: col.width } : undefined}>
                   {col.render(item)}
                 </td>
               ))}
               {rowActions && (
-                <td className="px-4 py-3 text-right">{rowActions(item)}</td>
+                <td className="px-2 py-3">{rowActions(item)}</td>
               )}
             </tr>
           ))}

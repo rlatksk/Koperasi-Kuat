@@ -31,10 +31,14 @@ function StatCard({ icon: Icon, label, value, color }: StatCardProps) {
 
 export default function DashboardPage() {
   const [barang, setBarang] = useState<Barang[]>([]);
+  const [totalBarang, setTotalBarang] = useState(0);
   const [recentTx, setRecentTx] = useState<Transaction[]>([]);
 
   useEffect(() => {
-    api.barang.list().then((res) => setBarang(res.data)).catch(console.error);
+    api.barang.list().then((res) => {
+      setBarang(res.data);
+      setTotalBarang(res.total);
+    }).catch(console.error);
     api.transaction.list({ limit: 10 }).then((res) => {
       setRecentTx(res.data || []);
     }).catch(console.error);
@@ -47,7 +51,7 @@ export default function DashboardPage() {
       <h1 className="text-xl font-bold text-gray-900 mb-6">Dashboard</h1>
 
       <div className="grid grid-cols-2 gap-4 mb-8">
-        <StatCard icon={Package} label="Total Barang" value={barang.length} color="bg-blue-600" />
+        <StatCard icon={Package} label="Total Barang" value={totalBarang} color="bg-blue-600" />
         <StatCard icon={CheckCircle} label="Total Stok (Eceran)" value={`${totalStock} unit`} color="bg-green-600" />
       </div>
 

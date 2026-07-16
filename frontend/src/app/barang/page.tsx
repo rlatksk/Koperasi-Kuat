@@ -46,13 +46,13 @@ export default function BarangPage() {
   };
 
   const columns: Column<Barang>[] = [
-    { key: 'nama_barang', header: 'Nama Barang', render: (b) => b.nama_barang, sortable: true },
-    { key: 'sku', header: 'SKU', render: (b) => <span className="font-mono text-xs">{b.sku}</span>, sortable: true },
-    { key: 'satuan_pembelian', header: 'Satuan Pembelian', render: (b) => b.satuan_pembelian },
-    { key: 'satuan_penjualan', header: 'Satuan Penjualan', render: (b) => b.satuan_penjualan },
+    { key: 'nama_barang', header: 'Nama Barang', render: (b) => b.nama_barang, sortable: true, width: '18%' },
+    { key: 'sku', header: 'SKU', render: (b) => <span className="font-mono text-xs">{b.sku}</span>, sortable: true, width: '11%' },
+    { key: 'satuan_pembelian', header: 'Satuan Pembelian', render: (b) => b.satuan_pembelian, width: '12%' },
+    { key: 'satuan_penjualan', header: 'Satuan Penjualan', render: (b) => b.satuan_penjualan, width: '12%' },
     {
       key: 'konversi_satuan', header: 'Konversi',
-      render: (b) => `1 ${b.satuan_pembelian} = ${Number(b.konversi_satuan)} ${b.satuan_penjualan}`,
+      render: (b) => `1 ${b.satuan_pembelian} = ${Number(b.konversi_satuan)} ${b.satuan_penjualan}`, width: '18%',
     },
     {
       key: 'stok', header: 'Stok',
@@ -60,7 +60,7 @@ export default function BarangPage() {
         const stok = Number(b.stok);
         const wholesale = stok / Number(b.konversi_satuan);
         return `${stok} ${b.satuan_penjualan} (${wholesale} ${b.satuan_pembelian})`;
-      },
+      }, width: '20%',
     },
   ];
 
@@ -93,7 +93,7 @@ export default function BarangPage() {
           data={barang}
           emptyMessage="Tidak ada barang. Buat barang pertama Anda."
           rowActions={(b) => (
-            <div className="flex items-center gap-1 justify-end">
+            <div className="flex items-center gap-1">
               <button
                 onClick={() => router.push(`/barang/${b.id}/edit`)}
                 className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"

@@ -3,7 +3,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, ILike } from 'typeorm';
+import { Repository, ILike, DataSource } from 'typeorm';
 import { Barang } from './entities/barang.entity';
 import { CreateBarangDto } from './dto/create-barang.dto';
 import { UpdateBarangDto } from './dto/update-barang.dto';
@@ -13,6 +13,7 @@ export class BarangService {
   constructor(
     @InjectRepository(Barang)
     private barangRepository: Repository<Barang>,
+    private dataSource: DataSource,
   ) {}
 
   async create(dto: CreateBarangDto): Promise<Barang> {
@@ -61,7 +62,8 @@ export class BarangService {
   }
 
   async remove(id: string): Promise<void> {
-    const barang = await this.findOne(id);
+    await this.findOne(id);
+    await this.dataSource.query('DELETE FROM stock_transaction WHERE barang_id = $1', [id]);
     const result = await this.barangRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException('Barang not found');

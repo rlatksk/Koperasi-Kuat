@@ -6,7 +6,6 @@ export interface Barang {
   satuan_penjualan: string;
   konversi_satuan: number;
   stok: number;
-  stok_pembelian?: number;
   created_at: string;
   updated_at: string;
 }
@@ -44,9 +43,4 @@ export interface CreateTransactionDto {
   satuan: string;
   keterangan?: string;
   nomor_transaksi?: string;
-}
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  total: number;
 }

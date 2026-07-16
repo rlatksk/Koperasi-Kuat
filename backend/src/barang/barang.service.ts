@@ -1,6 +1,5 @@
 import {
   Injectable, NotFoundException, ConflictException,
-  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike, DataSource } from 'typeorm';

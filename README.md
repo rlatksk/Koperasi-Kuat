@@ -200,11 +200,3 @@ node test/concurrent-transactions.js
 ├── database.sql      # PostgreSQL dump with sample data
 └── README.md
 ```
-
-## Running Tests
-
-```bash
-node test/concurrent-transactions.js
-```
-
-This fires 3 parallel POST requests and verifies all receive unique sequence numbers and correct stock total.

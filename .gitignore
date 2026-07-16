@@ -1,0 +1,8 @@
+node_modules/
+.env
+.env.local
+.next/
+dist/
+# opencode and meta docs
+.opencode/
+docs/superpowers/

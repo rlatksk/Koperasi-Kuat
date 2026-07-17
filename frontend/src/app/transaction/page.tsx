@@ -36,7 +36,7 @@ export default function TransactionPage() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
   useEffect(() => {
-    api.barang.list().then((res) => setBarangList(res.data)).catch(console.error);
+    api.barang.list({ limit: 1000 }).then((res) => setBarangList(res.data)).catch(console.error);
   }, []);
 
   const handleCancel = async () => {

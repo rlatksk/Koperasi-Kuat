@@ -28,7 +28,7 @@ export default function TransactionForm() {
   const selectedBarang = barangList.find((b) => b.id === form.barang_id);
 
   useEffect(() => {
-    api.barang.list().then((res) => setBarangList(res.data)).catch(console.error);
+    api.barang.list({ limit: 1000 }).then((res) => setBarangList(res.data)).catch(console.error);
   }, []);
 
   useEffect(() => {
@@ -81,8 +81,8 @@ export default function TransactionForm() {
 
   const satuanOptions = selectedBarang
     ? [
-        { value: selectedBarang.satuan_pembelian, label: selectedBarang.satuan_pembelian },
-        { value: selectedBarang.satuan_penjualan, label: selectedBarang.satuan_penjualan },
+        { value: selectedBarang.satuan_pembelian, label: `Grosir (${selectedBarang.satuan_pembelian})` },
+        { value: selectedBarang.satuan_penjualan, label: `Eceran (${selectedBarang.satuan_penjualan})` },
       ]
     : [];
 

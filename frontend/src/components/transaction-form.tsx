@@ -22,6 +22,7 @@ export default function TransactionForm() {
   const [autoSequence, setAutoSequence] = useState('');
   const [isManual, setIsManual] = useState(false);
   const [manualSequence, setManualSequence] = useState('');
+  const [customSequence, setCustomSequence] = useState<string | null>(null);
   const [sequenceError, setSequenceError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -59,8 +60,8 @@ export default function TransactionForm() {
       keterangan: form.keterangan || undefined,
     };
 
-    if (isManual) {
-      data.nomor_transaksi = manualSequence;
+    if (customSequence) {
+      data.nomor_transaksi = customSequence;
     }
 
     try {
@@ -154,12 +155,17 @@ export default function TransactionForm() {
         <label className="block text-sm font-medium text-gray-700 mb-1">Nomor Transaksi</label>
         {!isManual ? (
           <div className="flex items-center gap-2">
-            <span className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm text-gray-600 flex-1 font-mono">
-              {autoSequence || 'Memuat...'}
+            <span className={`px-3 py-2 bg-gray-100 border rounded-md text-sm text-gray-600 flex-1 font-mono ${
+              sequenceError ? 'border-red-500 ring-2 ring-red-200 text-red-600' : 'border-gray-300'
+            }`}>
+              {customSequence || autoSequence || 'Memuat...'}
             </span>
             <button
               type="button"
-              onClick={() => setIsManual(true)}
+              onClick={() => {
+                setManualSequence(customSequence || autoSequence);
+                setIsManual(true);
+              }}
               className="inline-flex items-center gap-1 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
             >
               <PencilSimple size={14} />
@@ -184,6 +190,7 @@ export default function TransactionForm() {
                 type="button"
                 onClick={() => {
                   setIsManual(false);
+                  setCustomSequence(null);
                   setSequenceError('');
                 }}
                 className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
@@ -192,16 +199,20 @@ export default function TransactionForm() {
               </button>
               <button
                 type="button"
-                onClick={() => setIsManual(false)}
+                onClick={() => {
+                  setCustomSequence(manualSequence);
+                  setIsManual(false);
+                  setSequenceError('');
+                }}
                 className="p-2 text-green-600 hover:bg-green-50 rounded-md transition-colors"
               >
                 <Check size={14} />
               </button>
             </div>
-            {sequenceError && (
-              <p className="text-xs text-red-600">{sequenceError}</p>
-            )}
           </div>
+        )}
+        {sequenceError && (
+          <p className="text-xs text-red-600 mt-1">{sequenceError}</p>
         )}
       </div>
 

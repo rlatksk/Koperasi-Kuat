@@ -25,9 +25,6 @@ export class StockTransaction {
   @Column({ type: 'decimal', precision: 18, scale: 6 })
   quantity: number;
 
-  @Column({ type: 'varchar', length: 20 })
-  tipe: string;
-
   @Column({ type: 'varchar', length: 50 })
   satuan: string;
 

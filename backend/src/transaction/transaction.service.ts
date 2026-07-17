@@ -84,7 +84,6 @@ export class TransactionService {
         barang_id: dto.barang_id,
         tanggal: new Date(dto.tanggal),
         quantity: dto.quantity,
-        tipe: 'pembelian',
         satuan: dto.satuan,
         konversi_snapshot: Number(barang.konversi_satuan),
         status: 'ACTIVE',

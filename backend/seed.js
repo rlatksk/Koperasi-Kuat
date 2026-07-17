@@ -175,9 +175,9 @@ async function seed() {
       const qty = randomBetween(1, 10);
 
       await client.query(
-        `INSERT INTO stock_transaction (id, nomor_transaksi, barang_id, tanggal, quantity, tipe, satuan, konversi_snapshot, status)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-        [crypto.randomUUID(), nomor, id, dateStr, qty, 'pembelian', b.pembelian, b.konversi, 'ACTIVE'],
+        `INSERT INTO stock_transaction (id, nomor_transaksi, barang_id, tanggal, quantity, satuan, konversi_snapshot, status)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [crypto.randomUUID(), nomor, id, dateStr, qty, b.pembelian, b.konversi, 'ACTIVE'],
       );
     }
   }

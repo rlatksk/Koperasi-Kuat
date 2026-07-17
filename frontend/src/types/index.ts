@@ -17,7 +17,6 @@ export interface Transaction {
   barang: { id: string; nama_barang: string };
   tanggal: string;
   quantity: number;
-  tipe: 'pembelian' | 'penjualan';
   satuan: string;
   konversi_snapshot: number;
   status: 'ACTIVE' | 'CANCELLED';

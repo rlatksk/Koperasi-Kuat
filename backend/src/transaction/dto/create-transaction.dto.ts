@@ -1,6 +1,6 @@
 import {
   IsNotEmpty, IsOptional, IsString, IsUUID,
-  IsDateString, IsPositive, IsIn, MaxLength,
+  IsDateString, IsPositive, MaxLength,
 } from 'class-validator';
 
 export class CreateTransactionDto {
@@ -12,9 +12,6 @@ export class CreateTransactionDto {
 
   @IsPositive()
   quantity: number;
-
-  @IsIn(['pembelian', 'penjualan'])
-  tipe: string;
 
   @IsNotEmpty()
   @IsString()

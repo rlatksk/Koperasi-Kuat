@@ -64,7 +64,6 @@ export class TransactionService {
         throw new NotFoundException('Barang not found');
       }
 
-      const isPembelian = dto.tipe === 'pembelian';
       const usesWholesale = dto.satuan === barang.satuan_pembelian;
 
       if (dto.satuan !== barang.satuan_pembelian && dto.satuan !== barang.satuan_penjualan) {
@@ -77,9 +76,7 @@ export class TransactionService {
         ? dto.quantity * Number(barang.konversi_satuan)
         : dto.quantity;
 
-      barang.stok = isPembelian
-        ? Number(barang.stok) + stockDelta
-        : Number(barang.stok) - stockDelta;
+      barang.stok = Number(barang.stok) + stockDelta;
       await manager.save(barang);
 
       const tx = manager.create(StockTransaction, {
@@ -87,7 +84,7 @@ export class TransactionService {
         barang_id: dto.barang_id,
         tanggal: new Date(dto.tanggal),
         quantity: dto.quantity,
-        tipe: dto.tipe,
+        tipe: 'pembelian',
         satuan: dto.satuan,
         konversi_snapshot: Number(barang.konversi_satuan),
         status: 'ACTIVE',
@@ -117,16 +114,13 @@ export class TransactionService {
         throw new NotFoundException('Barang not found');
       }
 
-      const isPembelian = tx.tipe === 'pembelian';
       const usesWholesale = tx.satuan === barang.satuan_pembelian;
 
       const stockDelta = usesWholesale
         ? Number(tx.quantity) * Number(tx.konversi_snapshot)
         : Number(tx.quantity);
 
-      barang.stok = isPembelian
-        ? Number(barang.stok) - stockDelta
-        : Number(barang.stok) + stockDelta;
+      barang.stok = Number(barang.stok) - stockDelta;
       await manager.save(barang);
 
       tx.status = 'CANCELLED';

@@ -15,7 +15,6 @@ export default function TransactionForm() {
     barang_id: '',
     tanggal: new Date().toISOString().split('T')[0],
     quantity: '',
-    tipe: 'pembelian' as 'pembelian' | 'penjualan',
     satuan: '',
     keterangan: '',
     nomor_transaksi: '',
@@ -42,13 +41,10 @@ export default function TransactionForm() {
   }, [form.tanggal, isManual]);
 
   useEffect(() => {
-    if (selectedBarang) {
-      const unit = form.tipe === 'pembelian'
-        ? selectedBarang.satuan_pembelian
-        : selectedBarang.satuan_penjualan;
-      setForm((f) => ({ ...f, satuan: unit }));
+    if (selectedBarang && !form.satuan) {
+      setForm((f) => ({ ...f, satuan: selectedBarang.satuan_pembelian }));
     }
-  }, [form.barang_id, form.tipe, selectedBarang?.satuan_pembelian, selectedBarang?.satuan_penjualan]);
+  }, [form.barang_id, selectedBarang?.satuan_pembelian, form.satuan]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -59,7 +55,6 @@ export default function TransactionForm() {
       barang_id: form.barang_id,
       tanggal: form.tanggal,
       quantity: parseFloat(form.quantity),
-      tipe: form.tipe,
       satuan: form.satuan,
       keterangan: form.keterangan || undefined,
     };
@@ -119,27 +114,6 @@ export default function TransactionForm() {
           className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           required
         />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Tipe Transaksi</label>
-        <div className="flex gap-4">
-          {(['pembelian', 'penjualan'] as const).map((t) => (
-            <label key={t} className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="tipe"
-                value={t}
-                checked={form.tipe === t}
-                onChange={() => setForm((f) => ({ ...f, tipe: t }))}
-                className="text-blue-600 focus:ring-blue-500"
-              />
-              <span className="text-sm text-gray-700">
-                {t === 'pembelian' ? 'Pembelian (Stok Masuk)' : 'Penjualan (Stok Keluar)'}
-              </span>
-            </label>
-          ))}
-        </div>
       </div>
 
       {selectedBarang && (

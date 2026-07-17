@@ -39,7 +39,6 @@ export interface CreateTransactionDto {
   barang_id: string;
   tanggal: string;
   quantity: number;
-  tipe: 'pembelian' | 'penjualan';
   satuan: string;
   keterangan?: string;
   nomor_transaksi?: string;

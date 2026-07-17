@@ -1,6 +1,6 @@
 # Stock Management System — PT KoperasiKuat
 
-Technical case submission for PT MULTI POWER ADITAMA Full Stack Developer role.
+Technical case submission for PT MULTI POWER ADITAMA Software Developer role.
 
 ## Tech Stack
 
@@ -13,7 +13,7 @@ Technical case submission for PT MULTI POWER ADITAMA Full Stack Developer role.
 - Node.js 18+ and npm
 - PostgreSQL 16 running on `localhost:5432`
 
-## Quick Start (under 5 minutes)
+## Quick Start
 
 ### 1. Create Database
 

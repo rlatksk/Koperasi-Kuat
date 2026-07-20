@@ -17,9 +17,9 @@ async function main() {
   console.log('Created barang:', barang.id);
 
   const txns = [
-    { barang_id: barang.id, tanggal: '2026-07-16', quantity: 1, satuan: 'pembelian', keterangan: 'Concurrent 1' },
-    { barang_id: barang.id, tanggal: '2026-07-16', quantity: 2, satuan: 'pembelian', keterangan: 'Concurrent 2' },
-    { barang_id: barang.id, tanggal: '2026-07-16', quantity: 3, satuan: 'pembelian', keterangan: 'Concurrent 3' },
+    { barang_id: barang.id, tanggal: '2026-07-16', quantity: 1, satuan: 'Box', keterangan: 'Concurrent 1' },
+    { barang_id: barang.id, tanggal: '2026-07-16', quantity: 2, satuan: 'Box', keterangan: 'Concurrent 2' },
+    { barang_id: barang.id, tanggal: '2026-07-16', quantity: 3, satuan: 'Box', keterangan: 'Concurrent 3' },
   ];
 
   const results = await Promise.all(

@@ -62,7 +62,7 @@ export class BarangService {
 
   async remove(id: string): Promise<void> {
     await this.findOne(id);
-    await this.dataSource.query('DELETE FROM stock_transaction WHERE barang_id = $1', [id]);
+    await this.dataSource.manager.delete('stock_transaction', { barang_id: id });
     const result = await this.barangRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException('Barang not found');
